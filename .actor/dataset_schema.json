@@ -1,0 +1,35 @@
+{
+  "$schema": "https://apify.com/schemas/v1/dataset.ide.json",
+  "actorSpecification": 1,
+  "fields": {
+    "url": {"type": "string", "title": "URL"},
+    "title": {"type": "string", "title": "Title"},
+    "auctionId": {"type": "string", "title": "Auction ID"},
+    "location": {"type": "string", "title": "Location"},
+    "startDate": {"type": "string", "title": "Start Date"},
+    "endDate": {"type": "string", "title": "End Date"},
+    "category": {"type": "string", "title": "Category"},
+    "description": {"type": "string", "title": "Description"},
+    "imageUrl": {"type": "string", "title": "Image URL"},
+    "scrapedAt": {"type": "string", "title": "Scraped At"}
+  },
+  "views": {
+    "overview": {
+      "title": "Overview",
+      "transformation": {
+        "fields": ["url", "title", "category", "location", "startDate", "endDate"]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "url": {"label": "URL", "format": "link"},
+          "title": {"label": "Title", "format": "text"},
+          "category": {"label": "Category", "format": "text"},
+          "location": {"label": "Location", "format": "text"},
+          "startDate": {"label": "Start Date", "format": "text"},
+          "endDate": {"label": "End Date", "format": "text"}
+        }
+      }
+    }
+  }
+}

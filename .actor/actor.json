@@ -1,0 +1,15 @@
+{
+  "actorSpecification": 1,
+  "name": "industrial-auctions-scraper",
+  "title": "Industrial Auctions Scraper",
+  "description": "Scrapes auction listings from industrial-auctions.com including machinery, equipment, and industrial assets. Built with Claude AI/ChatGPT and MCP for efficient data extraction.",
+  "version": "1.0",
+  "license": "Apache-2.0",
+  "dockerfile": "./Dockerfile",
+  "readme": "./README.md",
+  "inputSchema": "./.actor/input_schema.json",
+  "outputSchema": "./.actor/output_schema.json",
+  "storages": {
+    "dataset": "./.actor/dataset_schema.json"
+  }
+}

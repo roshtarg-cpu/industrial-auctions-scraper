@@ -1,0 +1,60 @@
+{
+  "title": "Industrial Auctions Scraper Input",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "maxResults": {
+      "title": "Maximum Results",
+      "type": "integer",
+      "description": "Maximum number of auction listings to scrape",
+      "default": 3,
+      "minimum": 1,
+      "maximum": 1000,
+      "editor": "number",
+      "prefill": 3
+    },
+    "category": {
+      "title": "Category Filter",
+      "type": "string",
+      "description": "Filter auctions by category (e.g., 'Food & Beverage', 'Machinery'). Leave empty for all categories.",
+      "editor": "select",
+      "enum": [
+        "",
+        "Food & Beverage",
+        "Machinery",
+        "Industrial Equipment",
+        "Transport",
+        "Other"
+      ],
+      "enumTitles": [
+        "All Categories",
+        "Food & Beverage",
+        "Machinery",
+        "Industrial Equipment",
+        "Transport",
+        "Other"
+      ],
+      "default": "",
+      "prefill": ""
+    },
+    "location": {
+      "title": "Location Filter",
+      "type": "string",
+      "description": "Filter auctions by location (e.g., 'Netherlands', 'Germany'). Leave empty for all locations.",
+      "editor": "textfield",
+      "default": "",
+      "prefill": ""
+    },
+    "proxyConfiguration": {
+      "title": "Proxy Configuration",
+      "type": "object",
+      "description": "Proxy settings for the scraper. Uses Apify residential proxies by default.",
+      "editor": "proxy",
+      "prefill": {
+        "useApifyProxy": true,
+        "apifyProxyGroups": ["RESIDENTIAL"]
+      }
+    }
+  },
+  "required": []
+}

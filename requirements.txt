@@ -1,0 +1,4 @@
+apify>=1.7.0,<2.0.0
+httpx
+beautifulsoup4
+lxml
