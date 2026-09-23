@@ -14,98 +14,63 @@ from bs4 import BeautifulSoup
 async def scrape_auction(session: httpx.AsyncClient, auction_element: Any, base_url: str) -> Optional[Dict[str, Any]]:
     """
     Extract auction data from a single auction container element.
-    Uses multi-strategy selectors with graceful fallbacks.
+    Selector strategy based on industrial-auctions.com actual structure.
     """
     try:
-        # Extract URL - multiple strategies
+        # Extract URL
         url = None
-        link = (
-            auction_element.find('a', {'data-auction-url': True}) or
-            auction_element.find('a', class_=lambda x: x and 'auction-link' in x) or
-            auction_element.find('a', href=lambda x: x and '/auction/' in x) or
-            auction_element.find('a')
-        )
+        link = auction_element.find('a', href=lambda x: x and '/auctions/' in str(x))
         if link and link.get('href'):
             href = link['href']
             url = href if href.startswith('http') else f"{base_url}{href}"
         
-        # Extract title
-        title = None
-        title_elem = (
-            auction_element.find(attrs={'data-auction-title': True}) or
-            auction_element.find('h2') or
-            auction_element.find('h3') or
-            auction_element.find(class_=lambda x: x and 'title' in str(x).lower())
-        )
-        if title_elem:
-            title = title_elem.get_text(strip=True)
-        
-        # Extract auction ID from URL or data attribute
+        # Extract auction ID from URL
         auction_id = None
         if url:
             parts = url.rstrip('/').split('/')
             if parts:
-                auction_id = parts[-1]
-        if not auction_id:
-            id_elem = auction_element.find(attrs={'data-auction-id': True})
-            if id_elem:
-                auction_id = id_elem.get('data-auction-id')
+                # Format: /en/auctions/2312-description/
+                segment = parts[-1] if parts[-1] else parts[-2]
+                auction_id = segment.split('-')[0]
         
-        # Extract location
-        location = None
-        location_elem = (
-            auction_element.find(attrs={'data-location': True}) or
-            auction_element.find(class_=lambda x: x and 'location' in str(x).lower()) or
-            auction_element.find('span', string=lambda x: x and ('location' in str(x).lower() or ',' in str(x)))
-        )
-        if location_elem:
-            location = location_elem.get_text(strip=True)
+        # Extract title from .auction-heading div
+        title = None
+        title_elem = auction_element.find('div', class_='auction-heading')
+        if title_elem:
+            title = title_elem.get_text(strip=True)
         
-        # Extract dates
+        # Extract dates from .auction-dates__entry divs
         start_date = None
         end_date = None
-        date_elem = (
-            auction_element.find(attrs={'data-start-date': True}) or
-            auction_element.find(class_=lambda x: x and 'date' in str(x).lower())
-        )
-        if date_elem:
-            start_date = date_elem.get('data-start-date') or date_elem.get_text(strip=True)
+        date_entries = auction_element.find_all('div', class_='auction-dates__entry')
+        for entry in date_entries:
+            text = entry.get_text(strip=True)
+            if 'Starts' in text:
+                start_date = text.replace('Starts', '').strip()
+            elif 'ends' in text.lower():
+                end_date = text.replace('Auction ends', '').replace('auction ends', '').strip()
         
-        end_date_elem = (
-            auction_element.find(attrs={'data-end-date': True}) or
-            auction_element.find(class_=lambda x: x and 'end-date' in str(x).lower())
-        )
-        if end_date_elem:
-            end_date = end_date_elem.get('data-end-date') or end_date_elem.get_text(strip=True)
+        # Extract location from title (format: "...in Location (CODE)")
+        location = None
+        if title:
+            import re
+            match = re.search(r'in\s+([^(]+)\s*\([A-Z]{2}\)', title)
+            if match:
+                location = match.group(1).strip()
         
-        # Extract category
+        # Category from title (first part before colon)
         category = None
-        category_elem = (
-            auction_element.find(attrs={'data-category': True}) or
-            auction_element.find(class_=lambda x: x and 'category' in str(x).lower()) or
-            auction_element.find('span', class_=lambda x: x and 'tag' in str(x).lower())
-        )
-        if category_elem:
-            category = category_elem.get('data-category') or category_elem.get_text(strip=True)
+        if title and ':' in title:
+            category = title.split(':')[1].split('in')[0].strip()
         
-        # Extract description
+        # Description - not in listing, would need detail page
         description = None
-        desc_elem = (
-            auction_element.find(attrs={'data-description': True}) or
-            auction_element.find(class_=lambda x: x and 'description' in str(x).lower()) or
-            auction_element.find('p')
-        )
-        if desc_elem:
-            description = desc_elem.get_text(strip=True)
         
         # Extract image URL
         image_url = None
-        img_elem = (
-            auction_element.find('img', attrs={'data-src': True}) or
-            auction_element.find('img', src=True)
-        )
+        img_elem = auction_element.find('img', src=True)
         if img_elem:
-            image_url = img_elem.get('data-src') or img_elem.get('src')
+            image_url = img_elem.get('src')
             if image_url and not image_url.startswith('http'):
                 image_url = f"{base_url}{image_url}"
         
@@ -187,14 +152,8 @@ async def main() -> None:
                 # Parse HTML
                 soup = BeautifulSoup(response.text, 'lxml')
                 
-                # Find auction containers using multiple strategies
-                auction_containers = (
-                    soup.find_all(attrs={'data-auction': True}) or
-                    soup.find_all('article', class_=lambda x: x and 'auction' in str(x).lower()) or
-                    soup.find_all('div', class_=lambda x: x and 'auction' in str(x).lower()) or
-                    soup.find_all('article') or
-                    []
-                )
+                # Find auction containers - use actual class from site
+                auction_containers = soup.find_all('div', class_='auction-block')
                 
                 Actor.log.info(f'Found {len(auction_containers)} auction containers')
                 
