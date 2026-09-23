@@ -1,18 +1,7 @@
 {
   "$schema": "https://apify.com/schemas/v1/dataset.ide.json",
   "actorSpecification": 1,
-  "fields": {
-    "url": {"type": "string", "title": "URL"},
-    "title": {"type": "string", "title": "Title"},
-    "auctionId": {"type": "string", "title": "Auction ID"},
-    "location": {"type": "string", "title": "Location"},
-    "startDate": {"type": "string", "title": "Start Date"},
-    "endDate": {"type": "string", "title": "End Date"},
-    "category": {"type": "string", "title": "Category"},
-    "description": {"type": "string", "title": "Description"},
-    "imageUrl": {"type": "string", "title": "Image URL"},
-    "scrapedAt": {"type": "string", "title": "Scraped At"}
-  },
+  "fields": {},
   "views": {
     "overview": {
       "title": "Overview",
