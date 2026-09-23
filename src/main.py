@@ -58,10 +58,14 @@ async def scrape_auction(session: httpx.AsyncClient, auction_element: Any, base_
             if match:
                 location = match.group(1).strip()
         
-        # Category from title (first part before colon)
+        # Category from title (text after colon, before " in")
         category = None
         if title and ':' in title:
-            category = title.split(':')[1].split('in')[0].strip()
+            after_colon = title.split(':', 1)[1]
+            if ' in ' in after_colon:
+                category = after_colon.split(' in ')[0].strip()
+            else:
+                category = after_colon.strip()
         
         # Description - not in listing, would need detail page
         description = None
