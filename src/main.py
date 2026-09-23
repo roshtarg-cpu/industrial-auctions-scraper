@@ -151,13 +151,15 @@ async def main() -> None:
         # Get proxy URL if configured
         proxy_url = None
         if proxy_config:
-            proxy_url = await Actor.create_proxy_configuration(proxy_config).new_url()
+            proxy_conf = await Actor.create_proxy_configuration(proxy_config)
+            proxy_url = await proxy_conf.new_url()
         
         # Use RESIDENTIAL proxy as specified
         if not proxy_url:
-            proxy_url = await Actor.create_proxy_configuration(
+            proxy_conf = await Actor.create_proxy_configuration(
                 actor_proxy_input={'useApifyProxy': True, 'apifyProxyGroups': ['RESIDENTIAL']}
-            ).new_url()
+            )
+            proxy_url = await proxy_conf.new_url()
         
         # Configure httpx client
         client_kwargs = {
