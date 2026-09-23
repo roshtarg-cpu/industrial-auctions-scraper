@@ -237,10 +237,10 @@ async def main() -> None:
         
         # Save task metadata at end
         await Actor.set_value('SAVED-TASK', {
-            'actorId': actor_input.actor_id,
-            'actorRunId': actor_input.actor_run_id,
-            'defaultDatasetId': actor_input.default_dataset_id,
-            'startedAt': actor_input.started_at.isoformat() if actor_input.started_at else None,
+            'actorId': actor_input.get('actor_id'),
+            'actorRunId': actor_input.get('actor_run_id'),
+            'defaultDatasetId': actor_input.get('default_dataset_id'),
+            'startedAt': actor_input.get('started_at'),
             'input': input_data,
             'stats': {
                 'itemsScraped': results_count,
