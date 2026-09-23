@@ -7,9 +7,9 @@
   "license": "Apache-2.0",
   "dockerfile": "./Dockerfile",
   "readme": "./README.md",
-  "inputSchema": "./.actor/input_schema.json",
-  "outputSchema": "./.actor/output_schema.json",
+  "inputSchema": "./input_schema.json",
+  "outputSchema": "./output_schema.json",
   "storages": {
-    "dataset": "./.actor/dataset_schema.json"
+    "dataset": "./dataset_schema.json"
   }
 }
