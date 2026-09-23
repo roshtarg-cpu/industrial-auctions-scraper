@@ -148,18 +148,17 @@ async def main() -> None:
         base_url = 'https://www.industrial-auctions.com'
         auctions_url = f'{base_url}/en/auctions'
         
-        # Get proxy URL if configured
+        # Get proxy URL if configured  
         proxy_url = None
         if proxy_config:
-            proxy_conf = await Actor.create_proxy_configuration(proxy_config)
-            proxy_url = await proxy_conf.new_url()
+            try:
+                proxy_conf = await Actor.create_proxy_configuration(proxy_config)
+                proxy_url = await proxy_conf.new_url()
+                Actor.log.info('Using custom proxy configuration')
+            except Exception as e:
+                Actor.log.warning(f'Proxy configuration failed: {e}, continuing without proxy')
         
-        # Use RESIDENTIAL proxy as specified
-        if not proxy_url:
-            proxy_conf = await Actor.create_proxy_configuration(
-                actor_proxy_input={'useApifyProxy': True, 'apifyProxyGroups': ['RESIDENTIAL']}
-            )
-            proxy_url = await proxy_conf.new_url()
+        # Site has LIGHT protection - works without proxy
         
         # Configure httpx client
         client_kwargs = {
